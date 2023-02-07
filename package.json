@@ -1,6 +1,6 @@
 {
   "name": "the-lord-of-the-rings-api-ts-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A TypeScript SDK for the The One (The Lord of the Rings) API",
   "author": "fcagalj@gmail.com",
   "main": "dist/index.js",
