@@ -47,7 +47,7 @@ export interface GetMovieQuotesOptions extends RequestOptions {
   data?: never;
   movieId: string;
   queryParameters?:
-    | Record<keyof Movie, string>
+    | Record<keyof Quote, string>
     | SortingParams
     | PaginationParams;
 }
