@@ -21,7 +21,10 @@ export interface RequestOptions {
 export interface ListMoviesOptions extends RequestOptions {
   // GET Request doesn't contain a body, "never" here prevents users from setting it
   data?: never;
-  queryParameters?: Record<keyof Movie, string>;
+  queryParameters?:
+    | Record<keyof Movie, string>
+    | SortingParams
+    | PaginationParams;
 }
 
 export interface GetMovieOptions extends RequestOptions {
@@ -30,10 +33,23 @@ export interface GetMovieOptions extends RequestOptions {
   queryParameters?: Record<string, string>;
 }
 
+export type SortingParams = {
+  sort?: string;
+};
+
+export type PaginationParams = {
+  limit?: string;
+  page?: string;
+  offset?: string;
+};
+
 export interface GetMovieQuotesOptions extends RequestOptions {
   data?: never;
   movieId: string;
-  queryParameters?: Record<keyof Quote, string>;
+  queryParameters?:
+    | Record<keyof Movie, string>
+    | SortingParams
+    | PaginationParams;
 }
 
 export interface TheOneApiResponse<T> {

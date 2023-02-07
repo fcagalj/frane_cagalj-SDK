@@ -1,196 +1,138 @@
-# Twitter API SDK for TypeScript
+# The One (The Lord of the Rings) API SDK for TypeScript
 
 ## Introduction
 
-A TypeScript SDK for the Twitter API. This library is built with TypeScript developers in mind, but it also works with JavaScript.
-
-**Note: This SDK is in beta and is not ready for production**
-
-You can find examples of using the client in the [examples/](examples/) directory
-
-**Note: Only Twitter API V2 is supported**
+A TypeScript SDK for The One (The Lord of the Rings) API. This library is built with TypeScript developers in mind, but it also works with JavaScript.
 
 ### Features
 
 - Full type information for requests and responses
 - OAuth2 support
-- Supports Node.js 14+. **Doesn't work in browser environments due to the Twitter API not supporting CORS**
+- Supports Node.js 18+. **Doesn't work in browser environments due to the The One (The Lord of the Rings) API not supporting CORS**
 
 ## Installing
 
 ```
-npm install twitter-api-sdk
+npm install the-lord-of-the-rings-api-ts-sdk
 ```
 
 ## Client
 
-To setup the client we will authenticate with a bearer-token as follows
+To set up the client you need to authenticate with authentication token
 
 ```typescript
-import { Client } from "twitter-api-sdk";
 
-const client = new Client("MY-BEARER-TOKEN");
+import { Client } from "the-lord-of-the-rings-api-ts-sdk";
+
+const client = new Client({ auth: 'MY-BEARER-TOKEN' });
 ```
-
-For more information about authentication [go here](#authentication)
-
 ## Examples
 
-### Consuming a Stream
+### Listing movies
 
 ```typescript
-import { Client } from "twitter-api-sdk";
+import { Client } from "the-lord-of-the-rings-api-ts-sdk";
 
-const client = new Client(process.env.BEARER_TOKEN);
+const client = new Client({ auth: ACCESS_TOKEN });
 
-async function main() {
-  const stream = client.tweets.sampleStream({
-    "tweet.fields": ["author_id"],
-  });
-  for await (const tweet of stream) {
-    console.log(tweet.data?.author_id);
-  }
+const moviesRes = await client.listMovies();
+
+if (!('docs' in moviesRes)) {
+    throw new Error(moviesRes.body.message);
 }
 
-main();
+const movies = moviesRes.docs;
 ```
 
-### Getting a Tweet
+### Getting a movie
 
 ```typescript
-import { Client } from "twitter-api-sdk";
+import { Client } from "the-lord-of-the-rings-api-ts-sdk";
 
-const client = new Client(process.env.BEARER_TOKEN);
+const client = new Client({ auth: ACCESS_TOKEN });
 
-async function main() {
-  const tweet = await client.tweets.findTweetById("20");
-  console.log(tweet.data.text);
+const movieRes = await client.getMovie({ movieId: movies[0].id });
+
+if (!('id' in movieRes)) {
+    throw new Error(movieRes.body.message);
 }
 
-main();
+console.log(`Movie: ${movieRes.name} (${movieRes.budgetInMillions} M$)`);
+
+
 ```
-
-## Streaming
-
-For endpoints that return a stream you get sent back an Async Generator which you can iterate over:
+### Getting a movie quotes
 
 ```typescript
-const stream = client.tweets.sampleStream();
+import { Client } from "the-lord-of-the-rings-api-ts-sdk";
 
-for await (const tweet of stream) {
-  console.log(tweet.data.text);
+const client = new Client({ auth: ACCESS_TOKEN });
+
+const quotesRes = await client.getMovieQuotes({ movieId: movieRes.id });
+
+if (!('docs' in quotesRes)) {
+    throw new Error('No movies to list');
 }
+
+const quotes = quotesRes.docs;
+
 ```
 
+## Sorting 
+
+Pass the `sort` parameter to the `queryParameters` method to sort the results.
+
+```typescript   
+import { Client } from "the-lord-of-the-rings-api-ts-sdk";
+    
+const client = new Client({ auth: ACCESS_TOKEN });
+
+    
+const moviesRes = await client.listMovies({ sort: 'name:desc' });
+```
+
+## Filtering
+
+Filter results by passing the value to any available key parameter to the `queryParameters`.
+
+```typescript   
+import { Client } from "the-lord-of-the-rings-api-ts-sdk";
+    
+const client = new Client({ auth: ACCESS_TOKEN });
+
+    
+const moviesRes = await client.listMovies({ name: 'hobbit' });
+```
 ## Pagination
+You can paginate results by passing the `limit`, `page`  and `offset` parameter to the `queryParameters` method.
 
-For endpoints that have pagination you can
+```typescript   
+import { Client } from "the-lord-of-the-rings-api-ts-sdk";
+    
+const client = new Client({ auth: ACCESS_TOKEN });
 
-```typescript
-const followers = client.users.usersIdFollowers("20");
-
-for await (const page of followers) {
-  console.log(page.data);
-}
-
-// This also works
-const followers = await client.users.usersIdFollowers("20");
-console.log(followers.data);
-```
-
-## Authentication
-
-This library supports App-only Bearer Token and OAuth 2.0
-
-You can see various examples on how to use the authentication in [examples/](examples/)
-
-## Getting Started
-
-Make sure you turn on OAuth2 in your apps user authentication settings, and set the type of app to be either a confidential client or a public client.
-
-### Creating a Public Auth Client
-
-```typescript
-const authClient = new auth.OAuth2User({
-  client_id: process.env.CLIENT_ID,
-  callback: "http://127.0.0.1:3000/callback",
-  scopes: ["tweet.read", "users.read", "offline.access"],
+const moviesRes = await client.listMovies({
+    queryParameters: { page: '2', offset: '3' },
 });
-
-const client = new Client(authClient);
-```
-
-### Creating a Confidential Auth Client
-```typescript
-const authClient = new auth.OAuth2User({
-  client_id: process.env.CLIENT_ID,
-  client_secret: process.env.CLIENT_SECRET,
-  callback: "http://127.0.0.1:3000/callback",
-  scopes: ["tweet.read", "users.read", "offline.access"],
-});
-
-const client = new Client(authClient);
-```
-
-
-### Generating an Authentication URL
-
-```typescript
-const authUrl = authClient.generateAuthURL({
-  code_challenge_method: "s256",
-});
-```
-
-### Requesting an Access Token
-
-Once the user has approved the OAuth flow, you will receive a `code` query parameter at the callback URL you specified.
-
-```typescript
-await authClient.requestAccessToken(code);
-```
-
-### Revoking an Access Token
-
-```typescript
-const response = await authClient.revokeAccessToken();
 ```
 
 ## Contributing
 
-Note this is only for developers who want to contribute code to the SDK
-
-
-### Clone the Repository
+### Live development
 
 ```
-git clone https://github.com/twitterdev/twitter-api-typescript-sdk
+npm run build:watch
 ```
-
-### Running the Generation Script
-
-Generating the SDK with the [latest OpenAPI spec](https://api.twitter.com/2/openapi.json). The version is any valid [SemVer](https://semver.org/) version
-
-```
-yarn generate 1.0.0
-```
-
-Generating the SDK with a local OpenAPI specification file.
-
-```
-yarn generate 1.0.0 --specFile ~/path/to/file/openapi.json
-```
-
-The files generated are put in the [src/gen](src/gen) directory, these files are not edited manually.
 
 ### Building
 
 ```
-yarn build
+npm run build
 ```
 
 ### Testing
 
 ```
-yarn test
+npm run test
 ```
 
