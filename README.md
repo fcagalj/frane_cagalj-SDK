@@ -51,9 +51,9 @@ import { Client } from "the-lord-of-the-rings-api-ts-sdk";
 
 const client = new Client({ auth: ACCESS_TOKEN });
 
-const movieRes = await client.getMovie({ movieId: movies[0].id });
+const movieRes = await client.getMovie({ movieId: movies[0]._id });
 
-if (!('id' in movieRes)) {
+if (!('_id' in movieRes)) {
     throw new Error(movieRes.body.message);
 }
 
@@ -68,7 +68,7 @@ import { Client } from "the-lord-of-the-rings-api-ts-sdk";
 
 const client = new Client({ auth: ACCESS_TOKEN });
 
-const quotesRes = await client.getMovieQuotes({ movieId: movieRes.id });
+const quotesRes = await client.getMovieQuotes({ movieId: movieRes._id });
 
 if (!('docs' in quotesRes)) {
     throw new Error('No movies to list');

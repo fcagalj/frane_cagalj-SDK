@@ -1,5 +1,5 @@
 export interface Movie {
-  id: string;
+  _id: string;
   name: string;
   runtimeInMinutes: number;
   budgetInMillions: number;
